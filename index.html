@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      transition: background-color 0.3s ease;
+    }
+    
+    .calculator {
+      max-width: 300px;
+      margin: 0 auto;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    
+    .calculator input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 24px;
+      text-align: right;
+      border: none;
+      background-color: transparent;
+      margin-bottom: 20px;
+    }
+    
+    .calculator-row {
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .calculator .calculator-row input[type="button"] {
+      flex-basis: 23%;
+      padding: 10px;
+      margin-bottom: 10px;
+      font-size: 20px;
+      background-color: #e0e0e0;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-align: center;
+    }
+    
+    .calculator-row:nth-child(2) input[type="button"],
+    .calculator-row:nth-child(3) input[type="button"],
+    .calculator-row:nth-child(4) input[type="button"],
+    .calculator-row:last-child input[type="button"] {
+      background-color: #f7f7f7;
+    }
+    
+    .calculator input[type="button"]:hover {
+      background-color: #d2d2d2;
+    }
+    
+    .calculator input[type="button"].equal-btn {
+      background-color: #ff9800;
+      color: #fff;
+    }
+    
+    .calculator input[type="button"].equal-btn:hover {
+      background-color: #e68a00;
+    }
+
+    /* Dark Mode */
+    .dark-mode {
+      background-color: #282c36;
+    }
+
+    .dark-mode body {
+      background-color: #282c36;
+    }
+
+    .dark-mode .calculator {
+      background-color: #1e2127;
+      box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
+    }
+
+    .dark-mode .calculator input[type="text"] {
+      color: #fff;
+    }
+
+    .dark-mode .calculator .calculator-row input[type="button"] {
+      background-color: #393e46;
+    }
+
+    .dark-mode .calculator input[type="button"]:hover {
+      background-color: #292e36;
+    }
+
+    .dark-mode .calculator input[type="button"].equal-btn {
+      background-color: #ff9800;
+      color: #000;
+    }
+
+    .dark-mode .calculator input[type="button"].equal-btn:hover {
+      background-color: #e68a00;
+      color: #fff;
+    }
+
+    .toggle-switch {
+      display: inline-block;
+      position: relative;
+      width: 60px;
+      height: 34px;
+    }
+
+    .toggle-switch input[type="checkbox"] {
+      display: none;
+    }
+
+    .toggle-switch label {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 34px;
+      background-color: #282c36;
+      transition: background-color 0.3s ease;
+    }
+
+    .toggle-switch label:before {
+      content: "";
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: 26px;
+      height: 26px;
+      background-color: #282c36;
+      border-radius: 50%;
+      transition: transform 0.3s ease;
+    }
+
+    .toggle-switch input[type="checkbox"]:checked + label {
+      background-color: #282c36;
+    }
+
+    .toggle-switch input[type="checkbox"]:checked + label:before {
+      transform: translateX(26px);
+    }
+
+    .toggle-switch .text-label {
+      display: inline-block;
+      margin-left: 10px;
+      color: #282c36;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .dark-mode .toggle-switch .text-label {
+      color: #282c36;
+    }
+  </style>
+</head>
+<body onload="setDefault()">
+  <div class="calculator">
+    <input type="text" id="result" value="0" readonly>
+    <div class="calculator-row">
+      <input type="button" value="7" onclick="addToResult('7')">
+      <input type="button" value="8" onclick="addToResult('8')">
+      <input type="button" value="9" onclick="addToResult('9')">
+      <input type="button" value="+" onclick="addToResult('+')">
+    </div>
+    <div class="calculator-row">
+      <input type="button" value="4" onclick="addToResult('4')">
+      <input type="button" value="5" onclick="addToResult('5')">
+      <input type="button" value="6" onclick="addToResult('6')">
+      <input type="button" value="-" onclick="addToResult('-')">
+    </div>
+    <div class="calculator-row">
+      <input type="button" value="1" onclick="addToResult('1')">
+      <input type="button" value="2" onclick="addToResult('2')">
+      <input type="button" value="3" onclick="addToResult('3')">
+      <input type="button" value="x" onclick="addToResult('*')">
+    </div>
+    <div class="calculator-row">
+      <input type="button" value="0" onclick="addToResult('0')">
+      <input type="button" value="." onclick="addToResult('.')">
+      <input type="button" value="/" onclick="addToResult('/')">
+      <input type="button" value="=" class="equal-btn" onclick="performCalculation()">
+    </div>
+    <div class="calculator-row">
+      <input type="button" value="C" onclick="clearResult()">
+    </div>
+  </div>
+
+  <div class="toggle-switch">
+    <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+    <label for="darkModeToggle" id="darkModeLabel"></label>
+    <span class="text-label" id="toggleText"></span>
+  </div>
+
+  <script>
+    let isNewNumber = true;
+    let isCalculationPerformed = false;
+
+    function setDefault() {
+      document.getElementById('result').value = '0';
+      const darkModeToggle = document.getElementById("darkModeToggle");
+      const darkModeLabel = document.getElementById("darkModeLabel");
+      const toggleText = document.getElementById("toggleText");
+
+      const isDarkMode = localStorage.getItem("darkMode") === "true";
+      darkModeToggle.checked = isDarkMode;
+      if (isDarkMode) {
+        document.body.classList.add("dark-mode");
+        darkModeLabel.style.backgroundColor = "#4caf50";
+        toggleText.textContent = "Dark Mode";
+      } else {
+        document.body.classList.remove("dark-mode");
+        darkModeLabel.style.backgroundColor = "#ccc";
+        toggleText.textContent = "Light Mode";
+      }
+    }
+
+    function addToResult(value) {
+      const result = document.getElementById('result');
+      if (isNewNumber) {
+        result.value = value;
+        isNewNumber = false;
+      } else {
+        result.value += value;
+      }
+      isCalculationPerformed = false;
+    }
+
+    function performCalculation() {
+      const result = document.getElementById('result');
+      if (isCalculationPerformed) return;
+      result.value = eval(result.value);
+      isCalculationPerformed = true;
+      isNewNumber = true;
+    }
+
+    function clearResult() {
+      document.getElementById('result').value = '0';
+      isNewNumber = true;
+    }
+
+    function toggleDarkMode() {
+      const darkModeToggle = document.getElementById("darkModeToggle");
+      const darkModeLabel = document.getElementById("darkModeLabel");
+      const toggleText = document.getElementById("toggleText");
+      const body = document.body;
+
+      if (darkModeToggle.checked) {
+        body.classList.add("dark-mode");
+        darkModeLabel.style.backgroundColor = "#4caf50";
+        toggleText.textContent = "Dark Mode";
+        localStorage.setItem("darkMode", "true");
+      } else {
+        body.classList.remove("dark-mode");
+        darkModeLabel.style.backgroundColor = "#ccc";
+        toggleText.textContent = "Light Mode";
+        localStorage.setItem("darkMode", "false");
+      }
+    }
+  </script>
+</body>
+  <p>Source code of this project: <a href="https://github.com/CoderSensui/Calculator">GITHUB</a></p>
+  </html>
+  
